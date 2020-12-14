@@ -21,7 +21,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
-      <Filter>リソース ファイル</Filter>
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
