@@ -22,6 +22,8 @@
 #define FONT_INSTALL_ERR_TITLE	TEXT("フォントインストールエラー")
 #define FONT_CREATE_ERR_TITLE	TEXT("フォント作成エラー")
 
+#define MUSIC_BGM_TITLE_PATH		TEXT(".\\MUSIC\\タイトルBGM.mp3")
+
 enum GAME_SCENE {
 	GAME_SCENE_START,
 	GAME_SCENE_PLAY,
@@ -81,6 +83,8 @@ char AllKeyState[256] = { '\0' };
 char OldAllKeyState[256] = { '\0' };
 
 MOUSE mouse;
+
+MUSIC BGM_TITLE;
 
 FONT FontTanu32;
 
@@ -406,9 +410,19 @@ VOID MY_START(VOID)
 	return;
 }
 
-
 VOID MY_START_PROC(VOID)
 {
+	
+
+
+	if (CheckSoundMem(BGM_TITLE.handle) == 0)
+	{
+		ChangeVolumeSoundMem(255 * 50 / 100, BGM_TITLE.handle);
+		PlaySoundMem(BGM_TITLE.handle, DX_PLAYTYPE_LOOP);
+	}
+	
+
+
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
 		GameScene = GAME_SCENE_PLAY;
