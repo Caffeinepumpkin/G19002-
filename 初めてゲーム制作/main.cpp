@@ -24,6 +24,10 @@
 
 #define MUSIC_BGM_TITLE_PATH		TEXT(".\\MUSIC\\タイトルBGM.mp3")
 
+#define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
+
+#define IMAGE_BACK_PATH			TEXT(".\\IMAGE\\砂漠.png")
+
 enum GAME_SCENE {
 	GAME_SCENE_START,
 	GAME_SCENE_PLAY,
@@ -45,7 +49,6 @@ typedef struct STRUCT_MOUSE
 	int OldButton[MOUSE_BUTTON_CODE] = { 0 };
 	int Button[MOUSE_BUTTON_CODE] = { 0 };
 }MOUSE;
-
 
 typedef struct STRUCT_FONT
 {
@@ -74,6 +77,8 @@ typedef struct STRUCT_MUSIC
 	int handle;
 }MUSIC;
 
+
+
 int StartTimeFps;
 int CountFps;
 float CalcFps;
@@ -89,6 +94,8 @@ MUSIC BGM_TITLE;
 FONT FontTanu32;
 
 int GameScene;
+
+IMAGE ImageBack;
 
 VOID MY_FPS_UPDATE(VOID);
 VOID MY_FPS_DRAW(VOID);
@@ -126,6 +133,9 @@ VOID MY_DELETE_IMAGE(VOID);
 
 BOOL MY_LOAD_MUSIC(VOID);
 VOID MY_DELETE_MUSIC(VOID);
+
+BOOL MY_LOAD_IMAGE(VOID);		
+VOID MY_DELETE_IMAGE(VOID);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -460,7 +470,7 @@ VOID MY_PLAY_DRAW(VOID)
 {
 
 	DrawString(0, 0, "プレイ画面(エスケープキーを押して下さい)", GetColor(255, 255, 255));
-
+	DrawGraph(ImageBack.x, ImageBack.y, ImageBack.handle, TRUE);
 	return;
 }
 
@@ -489,15 +499,26 @@ VOID MY_END_DRAW(VOID)
 	return;
 }
 
+
+
 BOOL MY_LOAD_IMAGE(VOID)
 {
-	
+		strcpy_s(ImageBack.path, IMAGE_BACK_PATH);		
+		ImageBack.handle = LoadGraph(ImageBack.path);	
+		if (ImageBack.handle == -1)
+		{
+			MessageBox(GetMainWindowHandle(), IMAGE_BACK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+			return FALSE;
+		}
+		GetGraphSize(ImageBack.handle, &ImageBack.width, &ImageBack.height);	
+		ImageBack.x = GAME_WIDTH / 2 - ImageBack.width / 2;		
+		ImageBack.y = GAME_HEIGHT / 2 - ImageBack.height / 2;
 	return TRUE;
 }
 
 VOID MY_DELETE_IMAGE(VOID)
 {
-	
+		DeleteGraph(ImageBack.handle);
 	return;
 }
 
