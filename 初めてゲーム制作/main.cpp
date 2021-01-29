@@ -26,16 +26,24 @@
 
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
 
+		
+
+
 #define IMAGE_TITLE_BK_PATH			TEXT(".\\IMAGE\\砂漠.png")		
-#define IMAGE_TITLE_ROGO_PATH		TEXT(".\\IMAGE\\syouzi.png")
-#define IMAGE_TITLE_ROGO_ROTA		0.005		
+#define IMAGE_TITLE_ROGO_PATH		TEXT(".\\IMAGE\\syouzi.png")	
+#define IMAGE_TITLE_ROGO_ROTA		0.005	
 #define IMAGE_TITLE_ROGO_ROTA_MAX	1.0			
 #define IMAGE_TITLE_ROGO_X_SPEED	1		
+#define IMAGE_TITLE_START_PATH		TEXT(".\\IMAGE\\砂漠.png")	
+#define IMAGE_TITLE_START_CNT		1			
+#define IMAGE_TITLE_START_CNT_MAX	30	
 
 #define IMAGE_TITLE_START_PATH		TEXT(".\\IMAGE\\タイトル.png")	
 #define IMAGE_TITLE_START_CNT		1			
 #define IMAGE_TITLE_START_CNT_MAX	30
 
+
+#define IMAGE_PLAY_BK_PATH			TEXT(".\\IMAGE\\ging.png")	
 #define IMAGE_BACK_PATH			TEXT(".\\IMAGE\\砂漠.png")
 
 
@@ -50,7 +58,7 @@
 #define MAP_DIV_YOKO		4
 #define MAP_DIV_NUM	MAP_DIV_TATE * MAP_DIV_YOKO	
 
-
+#define  GAME_MAP_PATH ".\\IMAGE\\MAP\\map.PNG"
 
 
 #define GAME_MAP_TATE_MAX	9	
@@ -68,11 +76,11 @@ enum GAME_MAP_KIND
 {
 	n = -1,	
 	k = 0,	
-	t = 9,	
+	t = 10,	
 	s = 5,
 	g = 3,
-	r = 7,
-	p = 7
+	r = 9,
+	p = 9
 };
 
 enum GAME_SCENE {
@@ -152,7 +160,8 @@ typedef struct STRUCT_CHARA
 
 typedef struct STRUCT_IMAGE_BACK
 {
-	BOOL IsDraw;		
+	IMAGE image;
+	BOOL IsDraw;
 }IMAGE_BACK;	
 
 
@@ -197,8 +206,9 @@ typedef struct STRUCT_MAP
 int StartTimeFps;				
 int CountFps;					
 float CalcFps;					
-int SampleNumFps = GAME_FPS;	
+int SampleNumFps = GAME_FPS;
 
+char keyState[256];    
 char AllKeyState[256] = { '\0' };			
 char OldAllKeyState[256] = { '\0' };	
 
@@ -214,7 +224,7 @@ IMAGE_BACK ImageBack[IMAGE_BACK_NUM];
 IMAGE ImageTitleBK;						
 IMAGE_ROTA ImageTitleROGO;				
 IMAGE_BLINK ImageTitleSTART;		
-
+                   
 
 CHARA player;		
 
@@ -251,7 +261,6 @@ VOID MY_ALL_KEYDOWN_UPDATE(VOID);
 BOOL MY_KEY_DOWN(int);			
 BOOL MY_KEY_UP(int);				
 BOOL MY_KEYDOWN_KEEP(int, int);	
-
 VOID MY_MOUSE_UPDATE(VOID);			
 BOOL MY_MOUSE_DOWN(int);			
 BOOL MY_MOUSE_UP(int);				
@@ -297,9 +306,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (MY_LOAD_IMAGE() == FALSE) { return -1; }
 	if (MY_LOAD_MUSIC() == FALSE) { return -1; }
 
-	/*player.CanShot = TRUE;
-	player.ShotReLoadCnt = 0;
-	player.ShotReLoadCntMAX = CHARA_RELOAD_LOW;*/
 
 	if (MY_FONT_INSTALL_ONCE() == FALSE) { return -1; }
 	if (MY_FONT_CREATE() == FALSE) { return -1; }
@@ -709,29 +715,33 @@ VOID MY_PLAY_PROC(VOID)
 			SetMousePoint(R_ClickPt.x, R_ClickPt.y);
 
 			SetMouseDispFlag(FALSE);
-		}
+		}\
 	}
 
-	if (mouse.Point.x >= 0 && mouse.Point.x <= GAME_WIDTH
-		&& mouse.Point.y >= 0 && mouse.Point.y <= GAME_HEIGHT)
+	
+	/*int KEY(int* Kn, int* Y, int* X)
 	{
-		int MoveValue = 100;
+		while (1) {
+			*Kn = getch();    
+			if ((*Kn == 0x00) || (*Kn == 0xe0)) 
+			
+			{*Kn = getch(); 
+				if (*Kn == 0x4b) { (*X)--; }
 
-		if (abs(player.collBeforePt.x - mouse.Point.x) < MoveValue
-			&& abs(player.collBeforePt.y - mouse.Point.y) < MoveValue)
-		{
-			player.CenterX = mouse.Point.x;
-			player.CenterY = mouse.Point.y;
+				else if (*Kn == 0x4d) { (*X)++; }
+				else if (*Kn == 0x48) { (*Y)--; }
+				else if (*Kn == 0x50) { (*Y)++; }
+			  
+				else { continue; }HamGameG19
+				break;
+			}
+			else if (*Kn == 0x1b) {}
+		
+			else { continue; }
+			break;
 		}
-		else
-		{
-			player.CenterX = player.collBeforePt.x;
-			player.CenterY = player.collBeforePt.y;
-
-			SetMousePoint(player.collBeforePt.x, player.collBeforePt.y);
-		}
-
-	}
+		return 0;
+	}*/
 
 	player.coll.left = player.CenterX - mapChip.width / 2 + 5;
 	player.coll.top = player.CenterY - mapChip.height / 2 + 5;
@@ -760,7 +770,9 @@ VOID MY_PLAY_PROC(VOID)
 	}
 
 
-	/*for (int num = 0; num < IMAGE_BACK_NUM; num++)
+
+
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
 		ImageBack[num].image.y++;
 		if (ImageBack[num].IsDraw == FALSE)
@@ -776,14 +788,14 @@ VOID MY_PLAY_PROC(VOID)
 			ImageBack[num].image.y = 0 - ImageBack[0].image.height * 3;
 			ImageBack[num].IsDraw = FALSE;								
 		}
-	}*/
+	}
 
 	return;
 }
 
 VOID MY_PLAY_DRAW(VOID)
 {
-	/*for (int num = 0; num < IMAGE_BACK_NUM; num++)
+	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
 		if (ImageBack[num].IsDraw == TRUE)
 		{
@@ -794,7 +806,7 @@ VOID MY_PLAY_DRAW(VOID)
 				ImageBack[num].image.y,
 				GetColor(255, 255, 255), "背景画像：%d", num + 1);
 		}
-	}*/
+	}
 
 	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
 	{
@@ -948,19 +960,17 @@ BOOL MY_LOAD_IMAGE(VOID)
 	player.CenterY = player.image.y + player.image.height / 2;	
 	player.speed = CHARA_SPEED_LOW;								
 
-	
+	int mapRes = LoadDivGraph(
+		GAME_MAP_PATH,										
+		MAP_DIV_NUM, MAP_DIV_TATE, MAP_DIV_YOKO,			
+		MAP_DIV_WIDTH, MAP_DIV_HEIGHT,						
+		&mapChip.handle[0]);								
 
-	//int mapRes = LoadDivGraph(
-	//	/*GAME_MAP_PATH,*/										
-	//	MAP_DIV_NUM, MAP_DIV_TATE, MAP_DIV_YOKO,			
-	//	MAP_DIV_WIDTH, MAP_DIV_HEIGHT,						
-	//	&mapChip.handle[0]);								
-
-	//if (mapRes == -1)
-	//{
-	//	MessageBox(GetMainWindowHandle(), GAME_MAP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
-	//	return FALSE;
-	//}
+	if (mapRes == -1)
+	{
+		MessageBox(GetMainWindowHandle(), GAME_MAP_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
 
 	GetGraphSize(mapChip.handle[0], &mapChip.width, &mapChip.height);
 
