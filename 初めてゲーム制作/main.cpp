@@ -1,3 +1,19 @@
+
+#include "DxLib.h"
+#include "resource.h"
+
+
+#define GAME_WIDTH			800	
+#define GAME_HEIGHT			600
+#define GAME_COLOR			32	
+
+#define GAME_WINDOW_BAR		0	
+#define GAME_WINDOW_NAME	"GAME TITLE"	
+
+#define GAME_FPS			60	
+
+#define MOUSE_BUTTON_CODE	129		
+
 #include "DxLib.h"
 #include "resource.h"
 
@@ -26,7 +42,7 @@
 
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
 
-		
+
 
 
 #define IMAGE_TITLE_BK_PATH			TEXT(".\\IMAGE\\砂漠.png")		
@@ -61,7 +77,7 @@
 #define  GAME_MAP_PATH ".\\IMAGE\\MAP\\map.PNG"
 
 
-#define GAME_MAP_TATE_MAX	9	
+#define GAME_MAP_TATE_MAX	18
 #define GAME_MAP_YOKO_MAX	9
 #define GAME_MAP_KIND_MAX	2	
 
@@ -74,9 +90,9 @@
 
 enum GAME_MAP_KIND
 {
-	n = -1,	
-	k = 0,	
-	t = 10,	
+	n = -1,
+	k = 0,
+	t = 10,
 	s = 5,
 	g = 3,
 	r = 9,
@@ -87,148 +103,147 @@ enum GAME_SCENE {
 	GAME_SCENE_START,
 	GAME_SCENE_PLAY,
 	GAME_SCENE_END,
-};	
+};
 
 enum CHARA_SPEED {
 	CHARA_SPEED_LOW = 1,
 	CHARA_SPEED_MIDI = 2,
 	CHARA_SPEED_HIGH = 3
-};	
+};
 
 enum CHARA_RELOAD {
 	CHARA_RELOAD_LOW = 60,
 	CHARA_RELOAD_MIDI = 30,
 	CHARA_RELOAD_HIGH = 15
-};	
+};
 
 typedef struct STRUCT_I_POINT
 {
-	int x = -1;	
-	int y = -1;	
+	int x = -1;
+	int y = -1;
 }iPOINT;
 
 typedef struct STRUCT_MOUSE
 {
-	int InputValue = 0;	
-	int WheelValue = 0;	
-	iPOINT Point;		
-	iPOINT OldPoint;	
-	int OldButton[MOUSE_BUTTON_CODE] = { 0 };	
-	int Button[MOUSE_BUTTON_CODE] = { 0 };	
+	int InputValue = 0;
+	int WheelValue = 0;
+	iPOINT Point;
+	iPOINT OldPoint;
+	int OldButton[MOUSE_BUTTON_CODE] = { 0 };
+	int Button[MOUSE_BUTTON_CODE] = { 0 };
 }MOUSE;
 
 typedef struct STRUCT_FONT
 {
 	char path[PATH_MAX];
 	char name[NAME_MAX];
-	int handle;					
-	int size;					
-	int bold;					
-	int type;					
+	int handle;
+	int size;
+	int bold;
+	int type;
 
 }FONT;
 
 typedef struct STRUCT_IMAGE
 {
-	char path[PATH_MAX];		
-	int handle;					
-	int x;						
-	int y;						
-	int width;					
-	int height;					
+	char path[PATH_MAX];
+	int handle;
+	int x;
+	int y;
+	int width;
+	int height;
 }IMAGE;
 
 typedef struct STRUCT_MUSIC
 {
-	char path[PATH_MAX];		
-	int handle;					
-}MUSIC;	
+	char path[PATH_MAX];
+	int handle;
+}MUSIC;
 
 
 typedef struct STRUCT_CHARA
 {
-	IMAGE image;				
-	int speed;					
-	int CenterX;				
-	int CenterY;				
+	IMAGE image;
+	int speed;
+	int CenterX;
+	int CenterY;
 
-	
-	RECT coll;					
-	iPOINT collBeforePt;		
 
-}CHARA;	
+	RECT coll;
+	iPOINT collBeforePt;
+
+}CHARA;
 
 typedef struct STRUCT_IMAGE_BACK
 {
 	IMAGE image;
 	BOOL IsDraw;
-}IMAGE_BACK;	
+}IMAGE_BACK;
 
 
 typedef struct STRUCT_IMAGE_ROTA
 {
-	IMAGE image;		
-	double angle;		
-	double angleMAX;	
-	double rate;		
-	double rateMAX;		
+	IMAGE image;
+	double angle;
+	double angleMAX;
+	double rate;
+	double rateMAX;
 
-}IMAGE_ROTA;	
+}IMAGE_ROTA;
 
 typedef struct STRUCT_IMAGE_BLINK
 {
-	IMAGE image;		
-	int Cnt;			
-	int CntMAX;			
-	BOOL IsDraw;		
+	IMAGE image;
+	int Cnt;
+	int CntMAX;
+	BOOL IsDraw;
 
-}IMAGE_BLINK;	
+}IMAGE_BLINK;
 
 
 typedef struct STRUCT_MAP_IMAGE
 {
-	char path[PATH_MAX];				
-	int handle[MAP_DIV_NUM];			
-	int kind[MAP_DIV_NUM];				
-	int width;							
-	int height;							
+	char path[PATH_MAX];
+	int handle[MAP_DIV_NUM];
+	int kind[MAP_DIV_NUM];
+	int width;
+	int height;
 }MAPCHIP;
 
 typedef struct STRUCT_MAP
 {
-	GAME_MAP_KIND kind;			
-	int x;						
-	int y;						
-	int width;					
-	int height;					
-}MAP;	
+	GAME_MAP_KIND kind;
+	int x;
+	int y;
+	int width;
+	int height;
+}MAP;
 
-int StartTimeFps;				
-int CountFps;					
-float CalcFps;					
+int StartTimeFps;
+int CountFps;
+float CalcFps;
 int SampleNumFps = GAME_FPS;
 
-char keyState[256];    
-char AllKeyState[256] = { '\0' };			
-char OldAllKeyState[256] = { '\0' };	
+char keyState[256];
+char AllKeyState[256] = { '\0' };
+char OldAllKeyState[256] = { '\0' };
 
 MOUSE mouse;
 
-FONT FontTanu32;	
+FONT FontTanu32;
 
-int GameScene;		
+int GameScene;
 
 IMAGE_BACK ImageBack[IMAGE_BACK_NUM];
 
 
-IMAGE ImageTitleBK;						
-IMAGE_ROTA ImageTitleROGO;				
-IMAGE_BLINK ImageTitleSTART;		
-                   
+IMAGE ImageTitleBK;
+IMAGE_ROTA ImageTitleROGO;
+IMAGE_BLINK ImageTitleSTART;
 
-CHARA player;		
 
-MUSIC BGM;			
+CHARA player;
+MUSIC BGM;
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 	//  0,1,2,3,4,5,6,7,8,9,0,1,2,
@@ -238,10 +253,18 @@ GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 		k,t,r,t,r,t,r,t,k,	// 3
 		k,t,r,k,r,k,r,k,k,	// 4
 		k,t,r,t,r,t,r,t,k,	// 5
-		k,t,r,t,r,t,r,t,k,	// 6
-		k,t,p,t,p,t,p,t,k,	// 7
-		k,k,k,k,s,k,k,k,k,	// 8
-};	
+		k,t,r,t,r,t,r,t,k,//6
+		k,t,r,t,r,t,r,t,k,//7
+		k,t,r,t,r,t,r,t,k,//8
+		k,t,r,t,r,t,r,t,k,//9
+		k,t,r,t,r,t,r,t,k,//0
+		k,t,r,t,r,t,r,t,k,//1
+		k,t,r,t,r,t,r,t,k,//2
+		k,t,r,t,r,t,r,t,k,//3
+		k,t,r,t,r,t,r,t,k,// 4
+		k,t,p,t,p,t,p,t,k,	// 5
+		k,k,k,k,s,k,k,k,k,	// 6
+};
 
 GAME_MAP_KIND mapDataInit[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
 
@@ -253,53 +276,53 @@ iPOINT startPt{ -1,-1 };
 
 RECT mapColl[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
 
-VOID MY_FPS_UPDATE(VOID);		
-VOID MY_FPS_DRAW(VOID);				
-VOID MY_FPS_WAIT(VOID);				
+VOID MY_FPS_UPDATE(VOID);
+VOID MY_FPS_DRAW(VOID);
+VOID MY_FPS_WAIT(VOID);
 
-VOID MY_ALL_KEYDOWN_UPDATE(VOID);	
-BOOL MY_KEY_DOWN(int);			
-BOOL MY_KEY_UP(int);				
-BOOL MY_KEYDOWN_KEEP(int, int);	
-VOID MY_MOUSE_UPDATE(VOID);			
-BOOL MY_MOUSE_DOWN(int);			
-BOOL MY_MOUSE_UP(int);				
-BOOL MY_MOUSEDOWN_KEEP(int, int);	
+VOID MY_ALL_KEYDOWN_UPDATE(VOID);
+BOOL MY_KEY_DOWN(int);
+BOOL MY_KEY_UP(int);
+BOOL MY_KEYDOWN_KEEP(int, int);
+VOID MY_MOUSE_UPDATE(VOID);
+BOOL MY_MOUSE_DOWN(int);
+BOOL MY_MOUSE_UP(int);
+BOOL MY_MOUSEDOWN_KEEP(int, int);
 
-BOOL MY_FONT_INSTALL_ONCE(VOID);	
-VOID MY_FONT_UNINSTALL_ONCE(VOID);	
-BOOL MY_FONT_CREATE(VOID);			
-VOID MY_FONT_DELETE(VOID);			
+BOOL MY_FONT_INSTALL_ONCE(VOID);
+VOID MY_FONT_UNINSTALL_ONCE(VOID);
+BOOL MY_FONT_CREATE(VOID);
+VOID MY_FONT_DELETE(VOID);
 
-VOID MY_START(VOID);		
-VOID MY_START_PROC(VOID);	
-VOID MY_START_DRAW(VOID);	
+VOID MY_START(VOID);
+VOID MY_START_PROC(VOID);
+VOID MY_START_DRAW(VOID);
 
-VOID MY_PLAY(VOID);	
-VOID MY_PLAY_PROC(VOID);	
-VOID MY_PLAY_DRAW(VOID);	
+VOID MY_PLAY(VOID);
+VOID MY_PLAY_PROC(VOID);
+VOID MY_PLAY_DRAW(VOID);
 
-VOID MY_END(VOID);		
-VOID MY_END_PROC(VOID);	
+VOID MY_END(VOID);
+VOID MY_END_PROC(VOID);
 VOID MY_END_DRAW(VOID);
 
-BOOL MY_LOAD_IMAGE(VOID);		
-VOID MY_DELETE_IMAGE(VOID);		
+BOOL MY_LOAD_IMAGE(VOID);
+VOID MY_DELETE_IMAGE(VOID);
 
-BOOL MY_LOAD_MUSIC(VOID);	
-VOID MY_DELETE_MUSIC(VOID);		
+BOOL MY_LOAD_MUSIC(VOID);
+VOID MY_DELETE_MUSIC(VOID);
 
-BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);	
-BOOL MY_CHECK_RECT_COLL(RECT, RECT);	
+BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);
+BOOL MY_CHECK_RECT_COLL(RECT, RECT);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	ChangeWindowMode(TRUE);				
+	ChangeWindowMode(TRUE);
 	SetGraphMode(GAME_WIDTH, GAME_HEIGHT, GAME_COLOR);
-	SetWindowStyleMode(GAME_WINDOW_BAR);				
-	SetMainWindowText(TEXT(GAME_WINDOW_NAME));			
-	SetAlwaysRunFlag(TRUE);				
-	SetWindowIconID(IDI_ICON1);		
+	SetWindowStyleMode(GAME_WINDOW_BAR);
+	SetMainWindowText(TEXT(GAME_WINDOW_NAME));
+	SetAlwaysRunFlag(TRUE);
+	SetWindowIconID(IDI_ICON1);
 
 	if (DxLib_Init() == -1) { return -1; }
 
@@ -310,9 +333,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (MY_FONT_INSTALL_ONCE() == FALSE) { return -1; }
 	if (MY_FONT_CREATE() == FALSE) { return -1; }
 
-	SetMouseDispFlag(TRUE);			
+	SetMouseDispFlag(TRUE);
 
-	GameScene = GAME_SCENE_START;	
+	GameScene = GAME_SCENE_START;
 
 	SetDrawScreen(DX_SCREEN_BACK);
 
@@ -322,7 +345,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			if (mapData[tate][yoko] == s)
 			{
-				startPt.x = mapChip.width * yoko + mapChip.width / 2;	
+				startPt.x = mapChip.width * yoko + mapChip.width / 2;
 				startPt.y = mapChip.height * tate + mapChip.height / 2;
 				break;
 			}
@@ -336,14 +359,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	while (TRUE)
 	{
-		if (ProcessMessage() != 0) { break; }	
-		if (ClearDrawScreen() != 0) { break; }	
+		if (ProcessMessage() != 0) { break; }
+		if (ClearDrawScreen() != 0) { break; }
 
-		MY_ALL_KEYDOWN_UPDATE();				
+		MY_ALL_KEYDOWN_UPDATE();
 
-		MY_MOUSE_UPDATE();					
+		MY_MOUSE_UPDATE();
 
-		MY_FPS_UPDATE();	
+		MY_FPS_UPDATE();
 
 		switch (GameScene)
 		{
@@ -351,18 +374,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			MY_START();
 			break;
 		case GAME_SCENE_PLAY:
-			MY_PLAY();	
+			MY_PLAY();
 			break;
 		case GAME_SCENE_END:
-			MY_END();	
+			MY_END();
 			break;
 		}
 
-		MY_FPS_DRAW();		
+		MY_FPS_DRAW();
 
-		ScreenFlip();		
+		ScreenFlip();
 
-		MY_FPS_WAIT();		
+		MY_FPS_WAIT();
 	}
 
 	MY_FONT_DELETE();
@@ -379,12 +402,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 VOID MY_FPS_UPDATE(VOID)
 {
-	if (CountFps == 0) 
+	if (CountFps == 0)
 	{
 		StartTimeFps = GetNowCount();
 	}
 
-	if (CountFps == SampleNumFps) 
+	if (CountFps == SampleNumFps)
 	{
 		int now = GetNowCount();
 		CalcFps = 1000.f / ((now - StartTimeFps) / (float)SampleNumFps);
@@ -403,12 +426,12 @@ VOID MY_FPS_DRAW(VOID)
 
 VOID MY_FPS_WAIT(VOID)
 {
-	int resultTime = GetNowCount() - StartTimeFps;					
-	int waitTime = CountFps * 1000 / GAME_FPS - resultTime;	
+	int resultTime = GetNowCount() - StartTimeFps;
+	int waitTime = CountFps * 1000 / GAME_FPS - resultTime;
 
-	if (waitTime > 0)	
+	if (waitTime > 0)
 	{
-		WaitTimer(waitTime);	
+		WaitTimer(waitTime);
 	}
 	return;
 }
@@ -416,23 +439,23 @@ VOID MY_FPS_WAIT(VOID)
 VOID MY_ALL_KEYDOWN_UPDATE(VOID)
 {
 
-	char TempKey[256];	
+	char TempKey[256];
 	for (int i = 0; i < 256; i++)
 	{
 		OldAllKeyState[i] = AllKeyState[i];
 	}
 
-	GetHitKeyStateAll(TempKey); 
+	GetHitKeyStateAll(TempKey);
 
 	for (int i = 0; i < 256; i++)
 	{
-		if (TempKey[i] != 0)	
+		if (TempKey[i] != 0)
 		{
-			AllKeyState[i]++;	
+			AllKeyState[i]++;
 		}
 		else
 		{
-			AllKeyState[i] = 0;	
+			AllKeyState[i] = 0;
 		}
 	}
 	return;
@@ -442,7 +465,7 @@ BOOL MY_KEY_DOWN(int KEY_INPUT_)
 {
 	if (AllKeyState[KEY_INPUT_] != 0)
 	{
-		return TRUE;	
+		return TRUE;
 	}
 	else
 	{
@@ -453,13 +476,13 @@ BOOL MY_KEY_DOWN(int KEY_INPUT_)
 BOOL MY_KEY_UP(int KEY_INPUT_)
 {
 	if (OldAllKeyState[KEY_INPUT_] >= 1
-		&& AllKeyState[KEY_INPUT_] == 0)	
+		&& AllKeyState[KEY_INPUT_] == 0)
 	{
-		return TRUE;	
+		return TRUE;
 	}
 	else
 	{
-		return FALSE;	
+		return FALSE;
 	}
 }
 
@@ -469,11 +492,11 @@ BOOL MY_KEYDOWN_KEEP(int KEY_INPUT_, int DownTime)
 
 	if (AllKeyState[KEY_INPUT_] > UpdateTime)
 	{
-		return TRUE;	
+		return TRUE;
 	}
 	else
 	{
-		return FALSE;	
+		return FALSE;
 	}
 }
 
@@ -486,14 +509,14 @@ VOID MY_MOUSE_UPDATE(VOID)
 
 	mouse.InputValue = GetMouseInput();
 
-	if ((mouse.InputValue & MOUSE_INPUT_LEFT) == MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT]++; }		
-	if ((mouse.InputValue & MOUSE_INPUT_LEFT) != MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT] = 0; }		
+	if ((mouse.InputValue & MOUSE_INPUT_LEFT) == MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT]++; }
+	if ((mouse.InputValue & MOUSE_INPUT_LEFT) != MOUSE_INPUT_LEFT) { mouse.Button[MOUSE_INPUT_LEFT] = 0; }
 
-	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) == MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE]++; }	
-	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) != MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE] = 0; }	
+	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) == MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE]++; }
+	if ((mouse.InputValue & MOUSE_INPUT_MIDDLE) != MOUSE_INPUT_MIDDLE) { mouse.Button[MOUSE_INPUT_MIDDLE] = 0; }
 
-	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) == MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT]++; }		
-	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) != MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT] = 0; }	
+	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) == MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT]++; }
+	if ((mouse.InputValue & MOUSE_INPUT_RIGHT) != MOUSE_INPUT_RIGHT) { mouse.Button[MOUSE_INPUT_RIGHT] = 0; }
 
 	mouse.WheelValue = GetMouseWheelRotVol();
 
@@ -504,24 +527,24 @@ BOOL MY_MOUSE_DOWN(int MOUSE_INPUT_)
 {
 	if (mouse.Button[MOUSE_INPUT_] != 0)
 	{
-		return TRUE;	
+		return TRUE;
 	}
 	else
 	{
-		return FALSE;	
+		return FALSE;
 	}
 }
 
 BOOL MY_MOUSE_UP(int MOUSE_INPUT_)
 {
-	if (mouse.OldButton[MOUSE_INPUT_] >= 1	
+	if (mouse.OldButton[MOUSE_INPUT_] >= 1
 		&& mouse.Button[MOUSE_INPUT_] == 0)
 	{
-		return TRUE;	
+		return TRUE;
 	}
 	else
 	{
-		return FALSE;	
+		return FALSE;
 	}
 }
 
@@ -531,11 +554,11 @@ BOOL MY_MOUSEDOWN_KEEP(int MOUSE_INPUT_, int DownTime)
 
 	if (mouse.Button[MOUSE_INPUT_] > UpdateTime)
 	{
-		return TRUE;	
+		return TRUE;
 	}
 	else
 	{
-		return FALSE;	
+		return FALSE;
 	}
 }
 
@@ -562,10 +585,10 @@ BOOL MY_FONT_CREATE(VOID)
 
 	strcpy_s(FontTanu32.path, sizeof(FontTanu32.path), FONT_TANU_PATH);
 	strcpy_s(FontTanu32.name, sizeof(FontTanu32.name), FONT_TANU_NAME);
-	FontTanu32.handle = -1;							
-	FontTanu32.size = 32;								
-	FontTanu32.bold = 1;								
-	FontTanu32.type = DX_FONTTYPE_ANTIALIASING_EDGE;	
+	FontTanu32.handle = -1;
+	FontTanu32.size = 32;
+	FontTanu32.bold = 1;
+	FontTanu32.type = DX_FONTTYPE_ANTIALIASING_EDGE;
 
 	FontTanu32.handle = CreateFontToHandle(FontTanu32.name, FontTanu32.size, FontTanu32.bold, FontTanu32.type);
 	if (FontTanu32.handle == -1) { MessageBox(GetMainWindowHandle(), FONT_TANU_NAME, FONT_CREATE_ERR_TITLE, MB_OK); return FALSE; }
@@ -582,8 +605,8 @@ VOID MY_FONT_DELETE(VOID)
 }
 VOID MY_START(VOID)
 {
-	MY_START_PROC();	
-	MY_START_DRAW();	
+	MY_START_PROC();
+	MY_START_DRAW();
 
 	return;
 }
@@ -592,7 +615,7 @@ VOID MY_START_PROC(VOID)
 {
 	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
-		SetMouseDispFlag(FALSE);		
+		SetMouseDispFlag(FALSE);
 
 		player.CenterX = startPt.x;
 		player.CenterY = startPt.y;
@@ -645,10 +668,10 @@ VOID MY_START_DRAW(VOID)
 	DrawGraph(ImageTitleBK.x, ImageTitleBK.y, ImageTitleBK.handle, TRUE);
 
 	DrawRotaGraph(
-		ImageTitleROGO.image.x, ImageTitleROGO.image.y,	
-		ImageTitleROGO.rate,							
-		ImageTitleROGO.angle,						
-		ImageTitleROGO.image.handle, TRUE);				
+		ImageTitleROGO.image.x, ImageTitleROGO.image.y,
+		ImageTitleROGO.rate,
+		ImageTitleROGO.angle,
+		ImageTitleROGO.image.handle, TRUE);
 
 	if (ImageTitleSTART.IsDraw == TRUE)
 	{
@@ -661,8 +684,8 @@ VOID MY_START_DRAW(VOID)
 
 VOID MY_PLAY(VOID)
 {
-	MY_PLAY_PROC();	
-	MY_PLAY_DRAW();	
+	MY_PLAY_PROC();
+	MY_PLAY_DRAW();
 
 	return;
 }
@@ -673,19 +696,19 @@ VOID MY_PLAY_PROC(VOID)
 	{
 		if (CheckSoundMem(BGM.handle) != 0)
 		{
-			StopSoundMem(BGM.handle);	
+			StopSoundMem(BGM.handle);
 		}
 
-		SetMouseDispFlag(TRUE);		
+		SetMouseDispFlag(TRUE);
 
 		GameScene = GAME_SCENE_END;
 
-		return;	
+		return;
 	}
 
 	if (CheckSoundMem(BGM.handle) == 0)
 	{
-		ChangeVolumeSoundMem(255 * 50 / 100, BGM.handle);	
+		ChangeVolumeSoundMem(255 * 50 / 100, BGM.handle);
 
 		PlaySoundMem(BGM.handle, DX_PLAYTYPE_LOOP);
 	}
@@ -697,20 +720,20 @@ VOID MY_PLAY_PROC(VOID)
 
 		int Ret = MessageBox(GetMainWindowHandle(), MOUSE_R_CLICK_CAPTION, MOUSE_R_CLICK_TITLE, MB_YESNO);
 
-		if (Ret == IDYES)		
+		if (Ret == IDYES)
 		{
 			if (CheckSoundMem(BGM.handle) != 0)
 			{
-				StopSoundMem(BGM.handle);	
+				StopSoundMem(BGM.handle);
 			}
 
-			SetMouseDispFlag(TRUE);			
+			SetMouseDispFlag(TRUE);
 
 			GameScene = GAME_SCENE_START;
 			return;
 
 		}
-		else if (Ret == IDNO)	
+		else if (Ret == IDNO)
 		{
 			SetMousePoint(R_ClickPt.x, R_ClickPt.y);
 
@@ -718,25 +741,25 @@ VOID MY_PLAY_PROC(VOID)
 		}\
 	}
 
-	
+
 	/*int KEY(int* Kn, int* Y, int* X)
 	{
 		while (1) {
-			*Kn = getch();    
-			if ((*Kn == 0x00) || (*Kn == 0xe0)) 
-			
-			{*Kn = getch(); 
+			*Kn = getch();
+			if ((*Kn == 0x00) || (*Kn == 0xe0))
+
+			{*Kn = getch();
 				if (*Kn == 0x4b) { (*X)--; }
 
 				else if (*Kn == 0x4d) { (*X)++; }
 				else if (*Kn == 0x48) { (*Y)--; }
 				else if (*Kn == 0x50) { (*Y)++; }
-			  
+
 				else { continue; }HamGameG19
 				break;
 			}
 			else if (*Kn == 0x1b) {}
-		
+
 			else { continue; }
 			break;
 		}
@@ -779,14 +802,14 @@ VOID MY_PLAY_PROC(VOID)
 		{
 			if (ImageBack[num].image.y + ImageBack[num].image.height > 0)
 			{
-				ImageBack[num].IsDraw = TRUE;	
+				ImageBack[num].IsDraw = TRUE;
 			}
 		}
 
 		if (ImageBack[num].image.y > GAME_HEIGHT)
 		{
 			ImageBack[num].image.y = 0 - ImageBack[0].image.height * 3;
-			ImageBack[num].IsDraw = FALSE;								
+			ImageBack[num].IsDraw = FALSE;
 		}
 	}
 
@@ -840,7 +863,7 @@ VOID MY_PLAY_DRAW(VOID)
 
 	DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);
 
-	
+
 
 	DrawString(0, 0, "プレイ画面(スペースキーを押して下さい)", GetColor(255, 255, 255));
 	return;
@@ -848,8 +871,8 @@ VOID MY_PLAY_DRAW(VOID)
 
 VOID MY_END(VOID)
 {
-	MY_END_PROC();	
-	MY_END_DRAW();	
+	MY_END_PROC();
+	MY_END_DRAW();
 	return;
 }
 
@@ -857,7 +880,7 @@ VOID MY_END_PROC(VOID)
 {
 	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
 	{
-		SetMouseDispFlag(TRUE);		
+		SetMouseDispFlag(TRUE);
 
 		GameScene = GAME_SCENE_START;
 	}
@@ -876,50 +899,50 @@ VOID MY_END_DRAW(VOID)
 BOOL MY_LOAD_IMAGE(VOID)
 {
 
-	strcpy_s(ImageTitleBK.path, IMAGE_TITLE_BK_PATH);		
-	ImageTitleBK.handle = LoadGraph(ImageTitleBK.path);		
+	strcpy_s(ImageTitleBK.path, IMAGE_TITLE_BK_PATH);
+	ImageTitleBK.handle = LoadGraph(ImageTitleBK.path);
 	if (ImageTitleBK.handle == -1)
 	{
 		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_BK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageTitleBK.handle, &ImageTitleBK.width, &ImageTitleBK.height);	
-	ImageTitleBK.x = GAME_WIDTH / 2 - ImageTitleBK.width / 2;	
-	ImageTitleBK.y = GAME_HEIGHT / 2 - ImageTitleBK.height / 2;		
+	GetGraphSize(ImageTitleBK.handle, &ImageTitleBK.width, &ImageTitleBK.height);
+	ImageTitleBK.x = GAME_WIDTH / 2 - ImageTitleBK.width / 2;
+	ImageTitleBK.y = GAME_HEIGHT / 2 - ImageTitleBK.height / 2;
 
-	strcpy_s(ImageTitleROGO.image.path, IMAGE_TITLE_ROGO_PATH);				
-	ImageTitleROGO.image.handle = LoadGraph(ImageTitleROGO.image.path);			
+	strcpy_s(ImageTitleROGO.image.path, IMAGE_TITLE_ROGO_PATH);
+	ImageTitleROGO.image.handle = LoadGraph(ImageTitleROGO.image.path);
 	if (ImageTitleROGO.image.handle == -1)
 	{
 		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_ROGO_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageTitleROGO.image.handle, &ImageTitleROGO.image.width, &ImageTitleROGO.image.height);	
-	ImageTitleROGO.image.x = 230;							
-	ImageTitleROGO.image.y = GAME_HEIGHT / 2;				
-	ImageTitleROGO.angle = DX_PI * 2;						
-	ImageTitleROGO.angleMAX = DX_PI * 2;					
-	ImageTitleROGO.rate = 0.0;								
-	ImageTitleROGO.rateMAX = IMAGE_TITLE_ROGO_ROTA_MAX;		
+	GetGraphSize(ImageTitleROGO.image.handle, &ImageTitleROGO.image.width, &ImageTitleROGO.image.height);
+	ImageTitleROGO.image.x = 230;
+	ImageTitleROGO.image.y = GAME_HEIGHT / 2;
+	ImageTitleROGO.angle = DX_PI * 2;
+	ImageTitleROGO.angleMAX = DX_PI * 2;
+	ImageTitleROGO.rate = 0.0;
+	ImageTitleROGO.rateMAX = IMAGE_TITLE_ROGO_ROTA_MAX;
 
-	strcpy_s(ImageTitleSTART.image.path, IMAGE_TITLE_START_PATH);					
-	ImageTitleSTART.image.handle = LoadGraph(ImageTitleSTART.image.path);		
+	strcpy_s(ImageTitleSTART.image.path, IMAGE_TITLE_START_PATH);
+	ImageTitleSTART.image.handle = LoadGraph(ImageTitleSTART.image.path);
 	if (ImageTitleSTART.image.handle == -1)
 	{
 		MessageBox(GetMainWindowHandle(), IMAGE_TITLE_START_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
 		return FALSE;
 	}
-	GetGraphSize(ImageTitleSTART.image.handle, &ImageTitleSTART.image.width, &ImageTitleSTART.image.height);	
-	ImageTitleSTART.image.x = GAME_WIDTH / 2 - ImageTitleSTART.image.width / 2;					
-	ImageTitleSTART.image.y = ImageTitleROGO.image.y + ImageTitleROGO.image.height / 2 + 10;	
-	ImageTitleSTART.Cnt = 0.0;								
-	ImageTitleSTART.CntMAX = IMAGE_TITLE_START_CNT_MAX;		
-	ImageTitleSTART.IsDraw = FALSE;							
+	GetGraphSize(ImageTitleSTART.image.handle, &ImageTitleSTART.image.width, &ImageTitleSTART.image.height);
+	ImageTitleSTART.image.x = GAME_WIDTH / 2 - ImageTitleSTART.image.width / 2;
+	ImageTitleSTART.image.y = ImageTitleROGO.image.y + ImageTitleROGO.image.height / 2 + 10;
+	ImageTitleSTART.Cnt = 0.0;
+	ImageTitleSTART.CntMAX = IMAGE_TITLE_START_CNT_MAX;
+	ImageTitleSTART.IsDraw = FALSE;
 
-	/*strcpy_s(ImageBack[0].image.path, IMAGE_BACK_PATH);			
-	strcpy_s(ImageBack[1].image.path, IMAGE_BACK_REV_PATH);		
-	strcpy_s(ImageBack[2].image.path, IMAGE_BACK_PATH);			
-	strcpy_s(ImageBack[3].image.path, IMAGE_BACK_REV_PATH);	*/	
+	/*strcpy_s(ImageBack[0].image.path, IMAGE_BACK_PATH);
+	strcpy_s(ImageBack[1].image.path, IMAGE_BACK_REV_PATH);
+	strcpy_s(ImageBack[2].image.path, IMAGE_BACK_PATH);
+	strcpy_s(ImageBack[3].image.path, IMAGE_BACK_REV_PATH);	*/
 
 	/*for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
@@ -931,22 +954,22 @@ BOOL MY_LOAD_IMAGE(VOID)
 		}
 		GetGraphSize(ImageBack[num].image.handle, &ImageBack[num].image.width, &ImageBack[num].image.height);
 	}
-	ImageBack[0].image.x = GAME_WIDTH / 2 - ImageBack[0].image.width / 2;	
-	ImageBack[0].image.y = 0 - ImageBack[0].image.height * 0;				
+	ImageBack[0].image.x = GAME_WIDTH / 2 - ImageBack[0].image.width / 2;
+	ImageBack[0].image.y = 0 - ImageBack[0].image.height * 0;
 	ImageBack[0].IsDraw = FALSE;
 
-	ImageBack[1].image.x = GAME_WIDTH / 2 - ImageBack[1].image.width / 2;	
-	ImageBack[1].image.y = 0 - ImageBack[0].image.height * 1;				
+	ImageBack[1].image.x = GAME_WIDTH / 2 - ImageBack[1].image.width / 2;
+	ImageBack[1].image.y = 0 - ImageBack[0].image.height * 1;
 	ImageBack[1].IsDraw = FALSE;
 
-	ImageBack[2].image.x = GAME_WIDTH / 2 - ImageBack[2].image.width / 2;	
-	ImageBack[2].image.y = 0 - ImageBack[0].image.height * 2;				
+	ImageBack[2].image.x = GAME_WIDTH / 2 - ImageBack[2].image.width / 2;
+	ImageBack[2].image.y = 0 - ImageBack[0].image.height * 2;
 	ImageBack[2].IsDraw = FALSE;
 
 	ImageBack[3].image.x = GAME_WIDTH / 2 - ImageBack[2].image.width / 2;
-	ImageBack[3].image.y = 0 - ImageBack[0].image.height * 3;				
+	ImageBack[3].image.y = 0 - ImageBack[0].image.height * 3;
 	ImageBack[3].IsDraw = FALSE;
-	strcpy_s(player.image.path, IMAGE_PLAYER_PATH);	
+	strcpy_s(player.image.path, IMAGE_PLAYER_PATH);
 	player.image.handle = LoadGraph(player.image.path);	*/
 	/*if (player.image.handle == -1)
 	{
@@ -954,17 +977,17 @@ BOOL MY_LOAD_IMAGE(VOID)
 		return FALSE;
 	}*/
 	GetGraphSize(player.image.handle, &player.image.width, &player.image.height);
-	player.image.x = GAME_WIDTH / 2 - player.image.width / 2;	
-	player.image.y = GAME_HEIGHT / 2 - player.image.height / 2;		
-	player.CenterX = player.image.x + player.image.width / 2;		
-	player.CenterY = player.image.y + player.image.height / 2;	
-	player.speed = CHARA_SPEED_LOW;								
+	player.image.x = GAME_WIDTH / 2 - player.image.width / 2;
+	player.image.y = GAME_HEIGHT / 2 - player.image.height / 2;
+	player.CenterX = player.image.x + player.image.width / 2;
+	player.CenterY = player.image.y + player.image.height / 2;
+	player.speed = CHARA_SPEED_LOW;
 
 	int mapRes = LoadDivGraph(
-		GAME_MAP_PATH,										
-		MAP_DIV_NUM, MAP_DIV_TATE, MAP_DIV_YOKO,			
-		MAP_DIV_WIDTH, MAP_DIV_HEIGHT,						
-		&mapChip.handle[0]);								
+		GAME_MAP_PATH,
+		MAP_DIV_NUM, MAP_DIV_TATE, MAP_DIV_YOKO,
+		MAP_DIV_WIDTH, MAP_DIV_HEIGHT,
+		&mapChip.handle[0]);
 
 	if (mapRes == -1)
 	{
@@ -1019,13 +1042,13 @@ VOID MY_DELETE_IMAGE(VOID)
 	DeleteGraph(ImageTitleSTART.image.handle);
 
 
-	
+
 	return;
 }
 
 BOOL MY_LOAD_MUSIC(VOID)
 {
-	/*strcpy_s(BGM.path, MUSIC_BGM_PATH);*/		
+	/*strcpy_s(BGM.path, MUSIC_BGM_PATH);*/
 	BGM.handle = LoadSoundMem(BGM.path);
 	/*if (BGM.handle == -1)
 	{
@@ -1068,8 +1091,8 @@ BOOL MY_CHECK_RECT_COLL(RECT a, RECT b)
 		a.bottom > b.top
 		)
 	{
-		return TRUE;	
+		return TRUE;
 	}
 
-	return FALSE;		
+	return FALSE;
 }

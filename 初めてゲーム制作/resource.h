@@ -1,1 +1,2 @@
 #define IDI_ICON1	1001
+#define IDI_ICON2	1002
