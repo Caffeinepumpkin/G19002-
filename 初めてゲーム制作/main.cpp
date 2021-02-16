@@ -40,8 +40,8 @@
 
 
 #define IMAGE_PLAY_BK_PATH			TEXT(".\\IMAGE\\ging.png")	
-#define IMAGE_BACK_PATH			TEXT(".\\IMAGE\\砂漠.png")
-
+#define IMAGE_BACK_PATH				TEXT(".\\IMAGE\\砂漠.png")
+#define IMAGE_GOAL_PATH				TEXT(".\\IMAGE\\シャチ.png")
 
 #define IMAGE_BACK_REV_PATH		TEXT(".\\IMAGE\\砂漠.png")	
 #define IMAGE_BACK_NUM			4								
@@ -213,6 +213,8 @@ IMAGE_BLINK ImageTitleSTART;
 CHARA player;
 MUSIC BGM;
 
+IMAGE ImageGoal;
+
 int scrollCnt = 0;		//スクロール
 int scrollCntMax = 2;	//スクロールＭＡＸ
 
@@ -288,6 +290,7 @@ BOOL MY_LOAD_MUSIC(VOID);
 VOID MY_DELETE_MUSIC(VOID);
 
 BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT);
+BOOL MY_CHECK_GOAL_PLAYER_COLL(RECT);
 BOOL MY_CHECK_RECT_COLL(RECT, RECT);
 
 VOID MY_PLAY_INIT(VOID);	//プレイ画面の初期化
@@ -710,7 +713,6 @@ VOID MY_PLAY_PROC(VOID)
 		}
 	}
 
-
 	//左キーを押したとき
 	if (MY_KEY_DOWN(KEY_INPUT_LEFT) == TRUE)
 	{
@@ -743,6 +745,12 @@ VOID MY_PLAY_PROC(VOID)
 		}
 	}
 
+	//ゴールに当たったら
+	if(MY_CHECK_GOAL_PLAYER_COLL(player.coll)==TRUE)
+	{
+		GameScene = GAME_SCENE_END;
+		return;
+	}
 	
 	return;
 }
@@ -795,9 +803,9 @@ VOID MY_END_PROC(VOID)
 {
 	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
 	{
-		SetMouseDispFlag(TRUE);
 
 		GameScene = GAME_SCENE_START;
+		return;
 	}
 
 	return;
@@ -805,14 +813,25 @@ VOID MY_END_PROC(VOID)
 
 VOID MY_END_DRAW(VOID)
 {
-	DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(0, 0, 255), TRUE);
-
+	//ゴール画像を描画
+	DrawGraph(ImageGoal.x, ImageGoal.y, ImageGoal.handle, TRUE);
+	
 	DrawString(0, 0, "エンド画面(エスケープキーを押して下さい)", GetColor(255, 255, 255));
 	return;
 }
 
 BOOL MY_LOAD_IMAGE(VOID)
 {
+	strcpy_s(ImageGoal.path, IMAGE_GOAL_PATH);
+	ImageGoal.handle = LoadGraph(ImageGoal.path);
+	if (ImageGoal.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), IMAGE_GOAL_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageGoal.handle, &ImageGoal.width, &ImageGoal.height);
+	ImageGoal.x = GAME_WIDTH / 2 - ImageGoal.width / 2;
+	ImageGoal.y = GAME_HEIGHT / 2 - ImageGoal.height / 2;
 
 	strcpy_s(ImageTitleBK.path, IMAGE_TITLE_BK_PATH);
 	ImageTitleBK.handle = LoadGraph(ImageTitleBK.path);
@@ -895,6 +914,7 @@ VOID MY_DELETE_IMAGE(VOID)
 
 
 	DeleteGraph(ImageTitleBK.handle);
+	DeleteGraph(ImageGoal.handle);
 	DeleteGraph(ImageTitleROGO.image.handle);
 	DeleteGraph(ImageTitleSTART.image.handle);
 
@@ -934,6 +954,27 @@ BOOL MY_CHECK_MAP1_PLAYER_COLL(RECT player)
 			{
 				//岩か空白の時は、当たっている
 				if (map[tate][yoko].kind == k || map[tate][yoko].kind == t)
+				{
+					return TRUE;
+				}
+			}
+		}
+	}
+
+	return FALSE;
+}
+
+
+BOOL MY_CHECK_GOAL_PLAYER_COLL(RECT player)
+{
+	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	{
+		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
+		{
+			if (MY_CHECK_RECT_COLL(player, mapColl[tate][yoko]) == TRUE)
+			{
+				//ゴールにたどり着いた
+				if (map[tate][yoko].kind == g)
 				{
 					return TRUE;
 				}
