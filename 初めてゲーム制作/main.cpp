@@ -30,7 +30,7 @@
 
 
 #define IMAGE_TITLE_BK_PATH			TEXT(".\\IMAGE\\çªîô.png")		
-#define IMAGE_TITLE_ROGO_PATH		TEXT(".\\IMAGE\\syouzi.png")	
+#define IMAGE_TITLE_ROGO_PATH		TEXT(".\\IMAGE\\ÇΩÇ¢Ç∆ÇÈ.png")	
 #define IMAGE_TITLE_ROGO_ROTA		0.005	
 #define IMAGE_TITLE_ROGO_ROTA_MAX	1.0			
 #define IMAGE_TITLE_ROGO_X_SPEED	1		
@@ -41,7 +41,7 @@
 
 #define IMAGE_PLAY_BK_PATH			TEXT(".\\IMAGE\\ging.png")	
 #define IMAGE_BACK_PATH				TEXT(".\\IMAGE\\çªîô.png")
-#define IMAGE_GOAL_PATH				TEXT(".\\IMAGE\\ÉVÉÉÉ`.png")
+#define IMAGE_GOAL_PATH				TEXT(".\\IMAGE\\Ç≠ÇËÇ†.png")
 
 #define IMAGE_BACK_REV_PATH		TEXT(".\\IMAGE\\çªîô.png")	
 #define IMAGE_BACK_NUM			4								
@@ -769,7 +769,7 @@ VOID MY_PLAY_DRAW(VOID)
 		}
 	}
 
-	for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
+	/*for (int tate = 0; tate < GAME_MAP_TATE_MAX; tate++)
 	{
 		for (int yoko = 0; yoko < GAME_MAP_YOKO_MAX; yoko++)
 		{
@@ -783,7 +783,7 @@ VOID MY_PLAY_DRAW(VOID)
 				DrawBox(mapColl[tate][yoko].left, mapColl[tate][yoko].top, mapColl[tate][yoko].right, mapColl[tate][yoko].bottom, GetColor(255, 255, 0), FALSE);
 			}
 		}
-	}
+	}*/
 
 	DrawGraph(player.x, player.y, player.handle, TRUE);
 	DrawBox(player.coll.left, player.coll.top, player.coll.right, player.coll.bottom, GetColor(255, 0, 0), FALSE);
